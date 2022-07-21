@@ -1,0 +1,19 @@
+{
+  "name": "deploy-action",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1177.0",
+    "cli-spinners": "^2.6.1",
+    "node-ssh": "^12.0.4",
+    "ora": "^6.1.2"
+  }
+}

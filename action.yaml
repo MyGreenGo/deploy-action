@@ -1,0 +1,97 @@
+name: 'Deploy action'
+description: 'This action perform a rolling update on a given list of EC2 instances inside a target group'
+inputs:
+  aws-secret-access-key-dev:
+    description: AWS secret for dev env
+    required: true
+    default: ""
+  aws-secret-key-id-dev:
+    description: AWS secret id for dev env
+    required: true
+    default: ""
+  server-list-dev:
+    description: array of EC2 instance ID
+    required: true
+    default: "[]"
+  arn-target-group-dev:
+    description: EC2's target group
+    required: true
+    default: ""
+
+  aws-secret-access-key-staging:
+    description: AWS secret for staging env
+    required: true
+    default: ""
+  aws-secret-key-id-staging:
+    description: AWS secret id for staging env
+    required: true
+    default: ""
+  server-list-staging:
+    description: array of EC2 instance ID
+    required: true
+    default: "[]"
+  arn-target-group-staging:
+    description: EC2's target group
+    required: true
+    default: ""
+
+  aws-secret-access-key-prod:
+    description: AWS secret for prod env
+    required: true
+    default: ""
+  aws-secret-key-id-prod:
+    description: AWS secret id for prod env
+    required: true
+    default: ""
+  server-list-prod:
+    description: array of EC2 instance ID
+    required: true
+    default: "[]"
+  arn-target-group-prod:
+    description: EC2's target group
+    required: true
+    default: ""
+
+# Unique parameters
+  npm-token:
+    description: NPM admin token for building the project
+    required: true
+    default: ""
+  command:
+    description: |
+      command the will be executed in the ssh session. 
+      Must be a onliner (join multiples command with &&)
+    required: true
+    default: ""
+  sha:
+    description: Sha of the commit to be deployed
+    required: true
+    default: ""
+  env:
+    description: Aws env the action will deploy to. Must be DEV/STAGING/PROD
+    required: true
+    default: ""
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.aws-secret-access-key-dev }}
+    - ${{ inputs.aws-secret-key-id-dev }}
+    - ${{ inputs.server-list-dev }}
+    - ${{ inputs.arn-target-group-dev }}
+
+    - ${{ inputs.aws-secret-access-key-staging }}
+    - ${{ inputs.aws-secret-key-id-staging }}
+    - ${{ inputs.server-list-staging }}
+    - ${{ inputs.arn-target-group-staging }}
+
+    - ${{ inputs.aws-secret-access-key-prod }}
+    - ${{ inputs.aws-secret-key-id-prod }}
+    - ${{ inputs.server-list-prod }}
+    - ${{ inputs.arn-target-group-prod }}
+
+    - ${{ inputs.npm-token }}
+    - ${{ inputs.command }}
+    - ${{ inputs.sha }}
+    - ${{ inputs.env }}
