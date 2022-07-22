@@ -46,10 +46,10 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
         throw new Error("ENV is not valid")
       }
 
-    let secret = process.env[`INPUT_AWS_SECRET_ACCESS_KEY_${process.env.INPUT_ENV}`]
-    let id = process.env[`INPUT_AWS_SECRET_KEY_ID_${process.env.INPUT_ENV}`]
+    let secret = process.env[`INPUT_AWS-SECRET-ACCESS-KEY-${process.env.INPUT_ENV}`]
+    let id = process.env[`INPUT_AWS-SECRET-KEY-ID-${process.env.INPUT_ENV}`]
 
-    let targetGroupARN = process.env[`INPUT_ARN_TARGET_GROUP_${process.env.INPUT_ENV}`]
+    let targetGroupARN = process.env[`INPUT_ARN-TARGET-GROUP-${process.env.INPUT_ENV}`]
 
     if (secret === "" ||
       id === "" ||
