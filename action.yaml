@@ -13,10 +13,6 @@ inputs:
     description: EC2's target group
     required: true
     default: ""
-  shh-key-dev:
-    description: EC2's ssh key
-    required: true
-    default: ""
 
   aws-secret-access-key-staging:
     description: AWS secret for staging env
@@ -30,11 +26,6 @@ inputs:
     description: EC2's target group
     required: true
     default: ""
-  shh-key-staging:
-    description: EC2's ssh key
-    required: true
-    default: ""
-
 
   aws-secret-access-key-prod:
     description: AWS secret for prod env
@@ -48,11 +39,6 @@ inputs:
     description: EC2's target group
     required: true
     default: ""
-  shh-key-prod:
-    description: EC2's ssh key
-    required: true
-    default: ""
-
 
 # Unique parameters
   npm-token:
@@ -81,19 +67,17 @@ runs:
     - ${{ inputs.aws-secret-access-key-dev }}
     - ${{ inputs.aws-secret-key-id-dev }}
     - ${{ inputs.arn-target-group-dev }}
-    - ${{ inputs.shh-key-dev }}
 
     - ${{ inputs.aws-secret-access-key-staging }}
     - ${{ inputs.aws-secret-key-id-staging }}
     - ${{ inputs.arn-target-group-staging }}
-    - ${{ inputs.shh-key-staging }}
 
     - ${{ inputs.aws-secret-access-key-prod }}
     - ${{ inputs.aws-secret-key-id-prod }}
     - ${{ inputs.arn-target-group-prod }}
-    - ${{ inputs.shh-key-prod }}
 
     - ${{ inputs.npm-token }}
     - ${{ inputs.command }}
     - ${{ inputs.sha }}
     - ${{ inputs.env }}
+    - ${{ inputs.shh-key }}
