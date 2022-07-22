@@ -9,10 +9,6 @@ inputs:
     description: AWS secret id for dev env
     required: true
     default: ""
-  server-list-dev:
-    description: array of EC2 instance ID
-    required: true
-    default: "[]"
   arn-target-group-dev:
     description: EC2's target group
     required: true
@@ -26,10 +22,6 @@ inputs:
     description: AWS secret id for staging env
     required: true
     default: ""
-  server-list-staging:
-    description: array of EC2 instance ID
-    required: true
-    default: "[]"
   arn-target-group-staging:
     description: EC2's target group
     required: true
@@ -43,10 +35,6 @@ inputs:
     description: AWS secret id for prod env
     required: true
     default: ""
-  server-list-prod:
-    description: array of EC2 instance ID
-    required: true
-    default: "[]"
   arn-target-group-prod:
     description: EC2's target group
     required: true
@@ -78,17 +66,14 @@ runs:
   args:
     - ${{ inputs.aws-secret-access-key-dev }}
     - ${{ inputs.aws-secret-key-id-dev }}
-    - ${{ inputs.server-list-dev }}
     - ${{ inputs.arn-target-group-dev }}
 
     - ${{ inputs.aws-secret-access-key-staging }}
     - ${{ inputs.aws-secret-key-id-staging }}
-    - ${{ inputs.server-list-staging }}
     - ${{ inputs.arn-target-group-staging }}
 
     - ${{ inputs.aws-secret-access-key-prod }}
     - ${{ inputs.aws-secret-key-id-prod }}
-    - ${{ inputs.server-list-prod }}
     - ${{ inputs.arn-target-group-prod }}
 
     - ${{ inputs.npm-token }}
