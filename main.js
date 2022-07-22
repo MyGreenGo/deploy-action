@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const { NodeSSH } = require('node-ssh')
+const CLI = require('clui');
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -7,14 +8,17 @@ function sleep(ms) {
   });
 }
 
-let waitForState = async (wantedState, target, targetGroup, elbv2) => {
+const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
 
-  var registered = null
+  var registered = null;
+
+  let Spinner = CLI.Spinner;
+  let countdown = new Spinner(`Waiting for target to be ${wantedState ? 'registered' : 'deregistered'} ...`, ['⣾','⣽','⣻','⢿','⡿','⣟','⣯','⣷']);
+  countdown.start();
 
   while (wantedState !== registered) {
-    console.log(`Waiting for server to be ${wantedState ? 'registered' : 'deregistered'} ...`)
     let state = await elbv2.describeTargetHealth({
-      TargetGroupArn: targetGroup.TargetGroupArn
+      TargetGroupArn: targetGroupARN
     }).promise()
 
     await sleep(1000)
@@ -26,9 +30,11 @@ let waitForState = async (wantedState, target, targetGroup, elbv2) => {
         s = true
       }
     }
-
     registered = s
   }
+
+  console.log("\n")
+  countdown.stop()
 }
 
 (async () => {
@@ -44,17 +50,10 @@ let waitForState = async (wantedState, target, targetGroup, elbv2) => {
     let id = process.env[`INPUT_AWS_SECRET_KEY_ID_${process.env.INPUT_ENV}`]
 
     let targetGroupARN = process.env[`INPUT_ARN_TARGET_GROUP_${process.env.INPUT_ENV}`]
-    var serverList
-    try {
-      serverList = eval(process.env[`INPUT_SERVER_LIST_${process.env.INPUT_ENV}`])
-    } catch (e) {
-      throw e
-    }
 
     if (secret === "" ||
       id === "" ||
-      targetGroupARN === "" ||
-      serverList.length === 0) {
+      targetGroupARN === "") {
       throw new Error("Missing param")
     }
 
@@ -69,16 +68,16 @@ let waitForState = async (wantedState, target, targetGroup, elbv2) => {
     conf.apiVersion = '2016-11-15'
     let ec2 = new AWS.EC2(conf);
 
-    let res = await elbv2.describeTargetGroups({
-      TargetGroupArns: [targetGroupARN]
+    let group = await elbv2.describeTargetHealth({
+      TargetGroupArn: targetGroupARN
     }).promise()
 
-    let tg  = res.TargetGroups[0]
     let ssh = new NodeSSH()
 
-    for (let i in serverList) {
+    for (let i in group.TargetHealthDescriptions) {
 
-      let instanceID = serverList[i]
+      let instanceID = group.TargetHealthDescriptions[i].Target.Id
+
       let instance = await ec2.describeInstances({
         InstanceIds: [instanceID]
       }).promise()
@@ -87,14 +86,14 @@ let waitForState = async (wantedState, target, targetGroup, elbv2) => {
 
       console.log(`Deregistering ${instanceID} ...`)
       await elbv2.deregisterTargets({
-        TargetGroupArn: tg.TargetGroupArn,
+        TargetGroupArn: targetGroupARN,
         Targets: [{
           Id: instanceID
         }]
       }).promise()
 
-      console.log(`Waiting for target to be deregistered ...`)
-      await waitForState(false, instanceID, tg, elbv2)
+      await waitForState(false, instanceID, targetGroupARN, elbv2)
+      console.log("Deregistered.")
 
       console.log("Updating via ssh")
 
@@ -115,19 +114,18 @@ let waitForState = async (wantedState, target, targetGroup, elbv2) => {
         throw new Error('Command failed')
       }
 
-      console.log("Waiting for target to be ready ...")
-
       await elbv2.registerTargets({
-        TargetGroupArn: tg.TargetGroupArn,
+        TargetGroupArn: targetGroupARN,
         Targets: [{
           Id: instanceID
         }]
       }).promise()
       console.log("Registering target back to the target group ...")
-      await waitForState(true, instanceID, tg, elbv2)
+      await waitForState(true, instanceID, targetGroupARN, elbv2)
 
       console.log(`Instance ${instanceID} successfuly updated !`)
     }
+    process.exit(0)
   } catch (error) {
     console.log(error)
   }

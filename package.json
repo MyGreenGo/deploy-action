@@ -13,6 +13,7 @@
   "dependencies": {
     "aws-sdk": "^2.1177.0",
     "cli-spinners": "^2.6.1",
+    "clui": "^0.3.6",
     "node-ssh": "^12.0.4",
     "ora": "^6.1.2"
   }
