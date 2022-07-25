@@ -103,6 +103,8 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
         privateKey: '/github/workspace/key.pem'
       })
 
+      console.log(process.env.INPUT_COMMAND.replace("{{SHA}}",process.env.INPUT_SHA))
+
       let exec = await ssh.execCommand(
         process.env.INPUT_COMMAND.replace(
           "{{SHA}}",
