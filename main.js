@@ -114,7 +114,17 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
       )
 
       if(exec.code !== 0) {
-        throw new Error('Command failed')
+        await elbv2.registerTargets({
+          TargetGroupArn: targetGroupARN,
+          Targets: [{
+            Id: instanceID
+          }]
+        }).promise()
+        console.log("Registering target back to the target group ...")
+        await waitForState(true, instanceID, targetGroupARN, elbv2)
+        
+        console.log(`Command on ${instanceID}, update aborted`)
+        process.exit(1)
       }
 
       await elbv2.registerTargets({
