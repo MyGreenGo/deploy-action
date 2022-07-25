@@ -59,10 +59,6 @@ inputs:
     description: Aws env the action will deploy to. Must be DEV/STAGING/PROD
     required: true
     default: ""
-  ssh-key:
-    description: ssh key used to connect to ec2 instances
-    required: true
-    default: ""
 
 runs:
   using: 'docker'
@@ -84,4 +80,3 @@ runs:
     - ${{ inputs.command }}
     - ${{ inputs.sha }}
     - ${{ inputs.env }}
-    - ${{ inputs.shh-key }}
