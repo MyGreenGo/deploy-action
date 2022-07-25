@@ -100,7 +100,7 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
       await ssh.connect({
         host: instance.PublicDnsName,
         username: 'ec2-user',
-        privateKey: '/key.pem'
+        privateKey: '/github/workspace/key.pem'
       })
 
       let exec = await ssh.execCommand(
