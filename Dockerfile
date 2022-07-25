@@ -1,7 +1,5 @@
 FROM node:16-alpine
 
-WORKDIR /github/workspace
-
 COPY ./package.json ./package.json
 COPY ./package-lock.json ./package-lock.json
 
@@ -14,4 +12,4 @@ RUN npm i
 
 COPY ./main.js ./main.js
 
-CMD [ "node", "main.js" ]
+ENTRYPOINT [ "node", "main.js" ]
