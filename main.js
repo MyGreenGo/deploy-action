@@ -46,20 +46,15 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
         throw new Error("ENV is not valid")
       }
 
-    let secret = process.env[`INPUT_AWS-SECRET-ACCESS-KEY-${process.env.INPUT_ENV}`]
-    let id = process.env[`INPUT_AWS-SECRET-KEY-ID-${process.env.INPUT_ENV}`]
-
-    let targetGroupARN = process.env[`INPUT_ARN-TARGET-GROUP-${process.env.INPUT_ENV}`]
-
-    if (secret === "" ||
-      id === "" ||
-      targetGroupARN === "") {
+    if (process.env[`INPUT_AWS-SECRET-ACCESS-KEY`] === "" ||
+        process.env[`INPUT_AWS-SECRET-KEY-ID`] === "" ||
+        process.env[`INPUT_ARN-TARGET-GROUP`] === "") {
       throw new Error("Missing param")
     }
 
     let conf = {
-      accessKeyId: id,
-      secretAccessKey: secret,
+      accessKeyId: process.env[`INPUT_AWS-SECRET-KEY-ID`],
+      secretAccessKey: process.env[`INPUT_AWS-SECRET-ACCESS-KEY`],
       region: "eu-west-3"
     }
 
@@ -69,7 +64,7 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
     let ec2 = new AWS.EC2(conf);
 
     let group = await elbv2.describeTargetHealth({
-      TargetGroupArn: targetGroupARN
+      TargetGroupArn: process.env[`INPUT_ARN-TARGET-GROUP`]
     }).promise()
 
     let ssh = new NodeSSH()
@@ -86,13 +81,13 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
 
       console.log(`Deregistering ${instanceID} ...`)
       await elbv2.deregisterTargets({
-        TargetGroupArn: targetGroupARN,
+        TargetGroupArn: process.env[`INPUT_ARN-TARGET-GROUP`],
         Targets: [{
           Id: instanceID
         }]
       }).promise()
 
-      await waitForState(false, instanceID, targetGroupARN, elbv2)
+      await waitForState(false, instanceID, process.env[`INPUT_ARN-TARGET-GROUP`], elbv2)
       console.log("Deregistered.")
 
       console.log("Updating via ssh")
@@ -100,7 +95,10 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
       await ssh.connect({
         host: instance.PublicDnsName,
         username: 'ec2-user',
-        privateKey: '/github/workspace/key.pem'
+        privateKey: Buffer.from(
+          process.env["INPUT_BASE64-ENCODED-SSH-KEY"],
+          'base64',
+        )
       })
 
       let exec = await ssh.execCommand(
@@ -115,26 +113,26 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
 
       if(exec.code !== 0) {
         await elbv2.registerTargets({
-          TargetGroupArn: targetGroupARN,
+          TargetGroupArn: process.env[`INPUT_ARN-TARGET-GROUP`],
           Targets: [{
             Id: instanceID
           }]
         }).promise()
         console.log("Registering target back to the target group ...")
-        await waitForState(true, instanceID, targetGroupARN, elbv2)
+        await waitForState(true, instanceID, process.env[`INPUT_ARN-TARGET-GROUP`], elbv2)
         
         console.log(`Command on ${instanceID}, update aborted`)
         process.exit(1)
       }
 
       await elbv2.registerTargets({
-        TargetGroupArn: targetGroupARN,
+        TargetGroupArn: process.env[`INPUT_ARN-TARGET-GROUP`],
         Targets: [{
           Id: instanceID
         }]
       }).promise()
       console.log("Registering target back to the target group ...")
-      await waitForState(true, instanceID, targetGroupARN, elbv2)
+      await waitForState(true, instanceID, process.env[`INPUT_ARN-TARGET-GROUP`], elbv2)
 
       console.log(`Instance ${instanceID} successfuly updated !`)
     }
