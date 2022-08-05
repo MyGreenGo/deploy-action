@@ -40,12 +40,6 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
 (async () => {
   try {
 
-    if(process.env.INPUT_ENV != "DEV" && 
-      process.env.INPUT_ENV != "STAGING" && 
-      process.env.INPUT_ENV != "PROD") {
-        throw new Error("ENV is not valid")
-      }
-
     if (process.env[`INPUT_AWS-SECRET-ACCESS-KEY`] === "" ||
         process.env[`INPUT_AWS-SECRET-KEY-ID`] === "" ||
         process.env[`INPUT_ARN-TARGET-GROUP`] === "") {

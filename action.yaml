@@ -27,10 +27,6 @@ inputs:
     description: Sha of the commit to be deployed
     required: true
     default: ""
-  env:
-    description: Aws env the action will deploy to. Must be DEV/STAGING/PROD
-    required: true
-    default: ""
   base64-encoded-ssh-key:
     description: base64 encoded ssh key used to connect to instance
     required: true
@@ -47,4 +43,3 @@ runs:
     - ${{ inputs.npm-token }}
     - ${{ inputs.command }}
     - ${{ inputs.sha }}
-    - ${{ inputs.env }}
