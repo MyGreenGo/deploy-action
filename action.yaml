@@ -27,8 +27,8 @@ inputs:
     description: Sha of the commit to be deployed
     required: true
     default: ""
-  base64-encoded-ssh-key:
-    description: base64 encoded ssh key used to connect to instance
+  path:
+    description: path where the .pem file is written
     required: true
     default: ""
 
@@ -42,4 +42,5 @@ runs:
     - ${{ inputs.arn-target-group }}
     - ${{ inputs.npm-token }}
     - ${{ inputs.command }}
+    - ${{ inputs.path }}
     - ${{ inputs.sha }}
