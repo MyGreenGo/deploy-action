@@ -89,10 +89,7 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
       await ssh.connect({
         host: instance.PublicDnsName,
         username: 'ec2-user',
-        privateKey: Buffer.from(
-          process.env["INPUT_BASE64-ENCODED-SSH-KEY"],
-          'base64',
-        )
+        privateKey: '/github/workspace/key.pem'
       })
 
       let exec = await ssh.execCommand(
@@ -114,7 +111,7 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
         }).promise()
         console.log("Registering target back to the target group ...")
         await waitForState(true, instanceID, process.env[`INPUT_ARN-TARGET-GROUP`], elbv2)
-        
+
         console.log(`Command on ${instanceID}, update aborted`)
         process.exit(1)
       }
