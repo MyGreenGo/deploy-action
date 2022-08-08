@@ -93,6 +93,16 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
         privateKey: path.join(process.env[`INPUT_PATH`], "key.pem")
       })
 
+      console.log(
+        process.env.INPUT_COMMAND.replace(
+          "{{SHA}}",
+          process.env.INPUT_SHA,
+        ).replace(
+          "{{INPUT_NPM_TOKEN}}", 
+          process.env["INPUT_NPM-TOKEN"]
+        )
+      )
+
       let exec = await ssh.execCommand(
         process.env.INPUT_COMMAND.replace(
           "{{SHA}}",
