@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const { NodeSSH } = require('node-ssh')
 const CLI = require('clui');
+const path = require('node:path');
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -89,7 +90,7 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
       await ssh.connect({
         host: instance.PublicDnsName,
         username: 'ec2-user',
-        privateKey: `${process.env[`INPUT_PATH`]}/key.pem`
+        privateKey: path.join(process.env[`INPUT_PATH`], "key.pem")
       })
 
       let exec = await ssh.execCommand(
@@ -112,7 +113,7 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
         console.log("Registering target back to the target group ...")
         await waitForState(true, instanceID, process.env[`INPUT_ARN-TARGET-GROUP`], elbv2)
 
-        console.log(`Command on ${instanceID}, update aborted`)
+        console.log(`Command on ${instanceID}, update aborted: ${exec.stderr}`)
         process.exit(1)
       }
 
