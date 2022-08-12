@@ -27,7 +27,8 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
     let s = false
 
     for (let instance in state.TargetHealthDescriptions) {
-      if (state.TargetHealthDescriptions[instance].Target.Id == target) {
+      if (state.TargetHealthDescriptions[instance].Target.Id        == target && 
+        state.TargetHealthDescriptions[instance].TargetHealth.State == "healthy") {
         s = true
       }
     }
@@ -137,6 +138,7 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
       await waitForState(true, instanceID, process.env[`INPUT_ARN-TARGET-GROUP`], elbv2)
 
       console.log(`Instance ${instanceID} successfuly updated !`)
+      await sleep(10000)
     }
     process.exit(0)
   } catch (error) {
