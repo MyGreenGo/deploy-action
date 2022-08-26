@@ -33,6 +33,7 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
         } else if (state.TargetHealthDescriptions[instance].TargetHealth.State == "draining") {
           s = null
         }
+        break
       } else {
         s = false
       }
