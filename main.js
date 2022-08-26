@@ -24,12 +24,17 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
 
     await sleep(1000)
 
-    let s = false
+    let s = null
 
     for (let instance in state.TargetHealthDescriptions) {
-      if (state.TargetHealthDescriptions[instance].Target.Id        == target && 
-        state.TargetHealthDescriptions[instance].TargetHealth.State == "healthy") {
-        s = true
+      if (state.TargetHealthDescriptions[instance].Target.Id == target) {
+        if (state.TargetHealthDescriptions[instance].TargetHealth.State == "healthy") {
+          s = true
+        } else if (state.TargetHealthDescriptions[instance].TargetHealth.State == "draining") {
+          s = null
+        } else {
+          s = false
+        }
       }
     }
     registered = s
