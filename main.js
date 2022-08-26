@@ -32,9 +32,9 @@ const waitForState = async (wantedState, target, targetGroupARN, elbv2) => {
           s = true
         } else if (state.TargetHealthDescriptions[instance].TargetHealth.State == "draining") {
           s = null
-        } else {
-          s = false
         }
+      } else {
+        s = false
       }
     }
     registered = s
